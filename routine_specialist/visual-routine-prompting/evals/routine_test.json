@@ -1,0 +1,12 @@
+{
+  "case_id": "morning_routine_check_001",
+  "input": "I just woke up, what should I do first?",
+  "expected_skill": "visual-routine-prompting",
+  "expected_output_format": "a2ui_json",
+  "rubric": [
+    "Uses A2UI Column layout for the routine list",
+    "Provides a 'ChoicePicker' for the user to confirm completion",
+    "Contains no complex medical jargon",
+    "Uses simple icons for visual clarity"
+  ]
+}
