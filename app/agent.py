@@ -1,27 +1,27 @@
-# ruff: noqa
-# Copyright 2026 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+    # ruff: noqa
+    # Copyright 2026 Google LLC
+    #
+    # Licensed under the Apache License, Version 2.0 (the "License");
+    # you may not use this file except in compliance with the License.
+    # You may obtain a copy of the License at
+    #
+    #     https://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing, software
+    # distributed under the License is distributed on an "AS IS" BASIS,
+    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    # See the License for the specific language governing permissions and
+    # limitations under the License.    
 
 import datetime
-from zoneinfo import ZoneInfo
-
+from zoneinfo import ZoneInfo   
+from google.adk.tools.mcp_tool import McpToolset, StdioConnectionParams
+from mcp.client.stdio import StdioServerParameters
 from google.adk.agents import Agent
 from google.adk.apps import App
 from google.adk.models import Gemini
 from google.adk.tools import LongRunningFunctionTool, FunctionTool, AgentTool
 from google.genai import types
-
 import os
 import google.auth
 
@@ -85,12 +85,29 @@ companion_agent = Agent(
     tools=[],  # Tools will be added here for specific skills later
 )
 
+progress_mcp_toolset = McpToolset(
+    connection_params=StdioConnectionParams(
+        server_params=StdioServerParameters(
+            command="python3",
+            args=["mcp_server.py"],
+            cwd=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "progress_analyst"),
+        ),
+        timeout=10.0,
+    ),
+)
+
 progress_agent = Agent(
     name="progress_agent",
     model=Gemini(model="gemini-flash-latest", retry_options=types.HttpRetryOptions(attempts=3)),
     description="An agent for parents, tracking milestones, providing summaries, and managing consent.",
-    instruction="You are a progress analyst agent for parents. Provide clear summaries and manage child profiles securely.",
-    tools=[],  # Tools will be added here for specific skills later
+    instruction=(
+        "You are a progress analyst agent for parents. Use your tools to fetch "
+        "real benchmark and milestone data -- never simulate or fabricate "
+        "verification steps or data. When asked how a child is progressing, "
+        "call get_milestones to retrieve real saved records before answering. "
+        "If there are no saved records, say so honestly rather than inventing one."
+    ),
+    tools=[progress_mcp_toolset],
 )
 
 coaching_agent = Agent(

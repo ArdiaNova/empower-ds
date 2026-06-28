@@ -1,1 +1,12 @@
-{"milestones": []}
+{
+  "milestones": [
+    {
+      "achievement": "Walking",
+      "date": "2026-05-12"
+    },
+    {
+      "achievement": "First word",
+      "date": "2026-03-01"
+    }
+  ]
+}
